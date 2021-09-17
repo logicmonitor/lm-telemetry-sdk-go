@@ -4,9 +4,8 @@ _NOTE: This is in private beta._
 
 ### LM-telemetry-sdk-go
 
-1. LM-telemetry-sdk-go is a go SDK  
-2. Aims to minimize adding initialization code for opentelemetry tracing, and assumes default values
-3. It has implementation for cloud specific resource detectors
+1. Aims to minimize adding initialization code for opentelemetry tracing, assumes default values
+2. It has implementation for cloud specific resource detectors
 
 ### Installation
 
