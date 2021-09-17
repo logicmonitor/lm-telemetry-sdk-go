@@ -1,11 +1,12 @@
-# LM-telemetry-go, a LogicMonitor Distro for OpenTelemetry 
+# LM-telemetry-sdk-go, go sdk for OpenTelemetry by LogicMonitor
 
 _NOTE: This is in private beta._
 
-### LM-telemetry-go
+### LM-telemetry-sdk-go
 
-LM-telemetry-go is a go SDK, which aims to minimize adding initialization code for opentelemetry tracing, and assumes default values.
-It has implementation for cloud specific resource detectors
+1. LM-telemetry-sdk-go is a go SDK  
+2. Aims to minimize adding initialization code for opentelemetry tracing, and assumes default values
+3. It has implementation for cloud specific resource detectors
 
 ### Installation
 
