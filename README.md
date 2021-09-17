@@ -1,4 +1,4 @@
-# LM-telemetry-sdk-go, go sdk for OpenTelemetry by LogicMonitor
+# LM-telemetry-sdk-go, a go sdk for OpenTelemetry by LogicMonitor
 
 _NOTE: This is in private beta._
 
