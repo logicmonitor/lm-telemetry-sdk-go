@@ -31,14 +31,14 @@ jobs:
           go-version: '1.14'
       # Runs a single command using the runners shell
       - name: Run coverage
-        run: make test-with-cover
+        run: make cover
 
       # Runs a set of commands using the runners shell
       - uses: actions/checkout@main
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          #files: ./coverage1.xml,./coverage2.xml # optional
+          #files: ./cover.out
           flags: unittests # optional
           name: codecov-umbrella # optional
           fail_ci_if_error: true # optional (default = false)
