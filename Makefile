@@ -11,7 +11,7 @@ TOOLS_MOD_DIR := ./tools
 
 GOTEST_MIN = go test 
 GOTEST = $(GOTEST_MIN) 
-GOTEST_WITH_COVERAGE = $(GOTEST) -coverprofile cover.out
+GOTEST_WITH_COVERAGE = $(GOTEST) -coverprofile cover.out ./...
 
 TOOLS_DIR := $(abspath ./tools)
 
@@ -34,7 +34,9 @@ trial:
 	$(TOOLS_MOD_DIR)/gocovmerge $(shell find . -name cover.out) > coverage.txt
 	rm $(shell find . -name cover.out)
 
-
+.PHONY: cover
+cover:
+	$(GOTEST_WITH_COVERAGE)
  
 .PHONY: test-with-cover
 test-with-cover:
