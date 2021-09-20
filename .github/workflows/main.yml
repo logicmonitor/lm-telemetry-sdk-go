@@ -24,8 +24,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
+       # with:
+        #  fetch-depth: 2
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14'
@@ -34,7 +34,7 @@ jobs:
         run: make cover
 
       # Runs a set of commands using the runners shell
-      - uses: actions/checkout@main
+      #- uses: actions/checkout@main
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
