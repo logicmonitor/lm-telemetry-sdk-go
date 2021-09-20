@@ -1,5 +1,7 @@
 # LM-telemetry-sdk-go, a go sdk for OpenTelemetry by LogicMonitor
 
+[![codecov](https://codecov.io/gh/logicmonitor/lm-telemetry-sdk-go/branch/main/graph/badge.svg?token=3UbakzCrzt)](https://codecov.io/gh/logicmonitor/lm-telemetry-sdk-go)
+
 _NOTE: This is in private beta._
 
 ### LM-telemetry-sdk-go
