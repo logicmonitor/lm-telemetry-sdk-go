@@ -5,18 +5,15 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/mock"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/utils"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
 var (
-	localIP   = "127.0.0.1"
-	nameTag   = "test-name-tag"
-	testError = errors.New("test error")
+	localIP = "127.0.0.1"
+	errTest = errors.New("test error")
 )
 
 func CreateEC2InstanceIdentityDocumentMock(PrivateIP string, err error) func() (ec2metadata.EC2InstanceIdentityDocument, error) {
@@ -26,19 +23,6 @@ func CreateEC2InstanceIdentityDocumentMock(PrivateIP string, err error) func() (
 		}, err
 	}
 	return getEc2InstanceIdentityDocumentSuccesMock
-}
-
-func CreateGetNameTagMock(name string) func(instanceID, region string) string {
-	var GetNameTagMock = func(instanceID, region string) string {
-		return name
-	}
-	return GetNameTagMock
-}
-
-func CreateAWSSessionMock(sess *session.Session, err error) func(cfgs ...*aws.Config) (*session.Session, error) {
-	return func(cfgs ...*aws.Config) (*session.Session, error) {
-		return sess, err
-	}
 }
 
 func TestDetect(t *testing.T) {
@@ -53,7 +37,6 @@ func TestDetect(t *testing.T) {
 		utils.AddEnvResAttributes = oldAddEnvResAttributes
 	}()
 	getEc2InstanceIdentityDocument = CreateEC2InstanceIdentityDocumentMock(localIP, nil)
-	//GetNameTag = CreateGetNameTagMock(nameTag)
 	utils.GetServiceDetails = mock.CreateGetServiceDetailsMock(map[string]string{"attrib1": "value1"})
 	utils.AddEnvResAttributes = mock.CreateAddEnvResAttributesMock(resource.Empty(), nil)
 
@@ -79,7 +62,7 @@ func TestDetect(t *testing.T) {
 		defer func() {
 			utils.AddEnvResAttributes = oldAddEnvResAttributes
 		}()
-		utils.AddEnvResAttributes = mock.CreateAddEnvResAttributesMock(resource.Empty(), testError)
+		utils.AddEnvResAttributes = mock.CreateAddEnvResAttributesMock(resource.Empty(), errTest)
 
 		_, err := ec2.Detect(context.Background())
 		if err != ec2Mock.Err {
@@ -90,7 +73,7 @@ func TestDetect(t *testing.T) {
 	t.Run("Error in resource detection", func(t *testing.T) {
 		ec2Mock := mock.DetectorMock{
 			Res: resource.Empty(),
-			Err: testError,
+			Err: errTest,
 		}
 
 		ec2 := EC2{
