@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	gcpProjectKey      = "GCP_PROJECT"
 	gcpFunctionNameKey = "K_SERVICE"
 )
 

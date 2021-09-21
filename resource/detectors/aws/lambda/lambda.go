@@ -16,15 +16,17 @@ import (
 )
 
 const (
-	executionEnvironment = "AWS_EXECUTION_ENV"
-	functionName         = "AWS_LAMBDA_FUNCTION_NAME"
-	region               = "AWS_REGION"
-	executionEnvionment  = "AWS_EXECUTION_ENV"
-	functionVersion      = "AWS_LAMBDA_FUNCTION_VERSION"
-	arnKey               = "InvokedFunctionArn"
-
-	colonSeperator = ":"
+	executionEnvironmentKey = "AWS_EXECUTION_ENV"
+	functionName            = "AWS_LAMBDA_FUNCTION_NAME"
+	region                  = "AWS_REGION"
+	//executionEnvionment     = "AWS_EXECUTION_ENV"
+	functionVersion = "AWS_LAMBDA_FUNCTION_VERSION"
+	colonSeperator  = ":"
 )
+
+type ctxArnKey string
+
+const arnKey ctxArnKey = "InvokedFunctionArn"
 
 var (
 	errNotOnLambda = errors.New("process is not on Lambda, cannot detect environment variables from lambda")
@@ -88,7 +90,7 @@ func lambdaFunctionVersion() string {
 }
 
 func awsLambdaExecutionEnvironment() string {
-	executionEnv, _ := os.LookupEnv(executionEnvionment)
+	executionEnv, _ := os.LookupEnv(executionEnvironmentKey)
 	return executionEnv
 }
 
