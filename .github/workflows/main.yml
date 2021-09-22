@@ -61,5 +61,3 @@ jobs:
         
       - name: Interpret Security Scan result
         run : ./sec
-        run: 
-          
