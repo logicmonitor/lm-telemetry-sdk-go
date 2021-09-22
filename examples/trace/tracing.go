@@ -34,6 +34,9 @@ func main() {
 
 	ctx, parentSpan := tracer.Start(ctx, "parent span")
 	defer parentSpan.End()
+
+	childFunc(ctx)
+
 }
 
 func childFunc(ctx context.Context) {
