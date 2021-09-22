@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 
 	"github.com/logicmonitor/lm-telemetry-sdk-go/config"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/telemetry"
@@ -21,14 +20,15 @@ func main() {
 		"key1": "value1",
 	}
 
-	err := telemetry.SetupTelemetry(ctx,
+	/*err :=*/
+	telemetry.SetupTelemetry(ctx,
 		config.WithAWSEC2Detector(),
 		config.WithAttributes(customAttributes),
 		config.WithHttpTraceEndpoint("localhost:55681"),
 	)
-	if err != nil {
-		log.Fatalf("error in setting up telemetry: %s", err.Error())
-	}
+	// if err != nil {
+	// 	log.Fatalf("error in setting up telemetry: %s", err.Error())
+	// }
 
 	tracer := otel.Tracer("tracer-1")
 
