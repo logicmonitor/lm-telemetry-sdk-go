@@ -44,9 +44,20 @@ jobs:
           fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
           
-      - uses: actions/checkout@v2
+      #- uses: actions/checkout@v2
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
           version: v1.29
           
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          # we let the report trigger content trigger a failure using the GitHub Security features.
+          args: '-no-fail -fmt json -out result.json ./...'
+        
+      - name: build result interpreter
+        run: go build build/sec.go
+        
+      - name: Interpret Security Scan result
+        run : ./sec
