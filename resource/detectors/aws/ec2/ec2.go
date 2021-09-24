@@ -19,16 +19,22 @@ const (
 	awsARN       = "aws.arn"
 )
 
+//NewResourceDetector will return an implementation for aws ec2 resource detector
 func NewResourceDetector() resource.Detector {
 	return &EC2{
 		otelAWS: &otelcontribaws.AWS{},
 	}
 }
 
+//EC2 implements resource.Detector interface, for an ec2 instance
 type EC2 struct {
 	otelAWS resource.Detector
 }
 
+/*
+Detect will return a resource instance which will have attributes describing,
+an ec2 instance
+*/
 func (ec2 *EC2) Detect(ctx context.Context) (*resource.Resource, error) {
 	awsRes, err := ec2.otelAWS.Detect(ctx)
 	if err != nil {

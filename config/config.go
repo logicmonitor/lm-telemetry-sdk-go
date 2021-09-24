@@ -7,6 +7,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
+//Config represents opentelemetry configurations
 type Config struct {
 	UserResourceAttributes map[string]string
 	Detector               resource.Detector
@@ -15,15 +16,16 @@ type Config struct {
 
 type Option func(*Config)
 
+// NewConfig returns new instance of config
 func NewConfig() *Config {
 	return &Config{
-		Detector: &DefaultDetector{},
+		Detector: &defaultDetector{},
 	}
 }
 
-type DefaultDetector struct {
+type defaultDetector struct {
 }
 
-func (dd *DefaultDetector) Detect(ctx context.Context) (*resource.Resource, error) {
+func (dd *defaultDetector) Detect(ctx context.Context) (*resource.Resource, error) {
 	return lmresource.New(ctx), nil
 }

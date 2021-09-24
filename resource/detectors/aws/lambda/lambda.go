@@ -40,9 +40,11 @@ var getLambdaClient = func(p client.ConfigProvider, cfgs ...*aws.Config) LambdaC
 	return lambda.New(p, cfgs...)
 }
 
+//Lambda implements, resource.Detector for aws lambda
 type Lambda struct {
 }
 
+//Detect will return a resource instance which will have attributes describing lambda
 func (lm *Lambda) Detect(ctx context.Context) (*resource.Resource, error) {
 	if !isAWSLambda() {
 		return resource.Empty(), errNotOnLambda
