@@ -14,7 +14,7 @@ import (
 
 /* SetupTelemetry initializes opentelemetry configurations,
 and takes in context and config.Option(s) as input params.
-configuration options could be found in config package */
+Configuration options could be found in config package. */
 func SetupTelemetry(ctx context.Context, opts ...config.Option) error {
 	c := config.NewConfig()
 

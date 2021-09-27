@@ -2,14 +2,15 @@ package config
 
 import "github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/aws/ec2"
 
-//WithAttributes returns a config option which adds custom attributes to resource
+/* WithAttributes returns a config option which adds
+custom attributes to resource */
 func WithAttributes(attributes map[string]string) Option {
 	return func(c *Config) {
 		c.UserResourceAttributes = attributes
 	}
 }
 
-/*WithAWSEC2Detector returns a config option which sets
+/* WithAWSEC2Detector returns a config option which sets
 config detector to ec2 detector
 */
 func WithAWSEC2Detector() Option {

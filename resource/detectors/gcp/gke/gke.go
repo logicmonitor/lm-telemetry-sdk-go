@@ -18,7 +18,7 @@ func (computeEngine *GKE) Detect(ctx context.Context) (*resource.Resource, error
 	return res, err
 }
 
-// NewResourceDetector will return an implementation for gcp gce resource detector
+// NewResourceDetector will return an implementation for gcp gke resource detector
 func NewResourceDetector() resource.Detector {
 	return &GKE{
 		gke: &gcp.GKE{},

@@ -32,11 +32,11 @@ var (
 	errNotOnLambda = errors.New("process is not on Lambda, cannot detect environment variables from lambda")
 )
 
-type LambdaClient interface {
+type lambdaClient interface {
 	GetFunction(input *lambda.GetFunctionInput) (*lambda.GetFunctionOutput, error)
 }
 
-var getLambdaClient = func(p client.ConfigProvider, cfgs ...*aws.Config) LambdaClient {
+var getLambdaClient = func(p client.ConfigProvider, cfgs ...*aws.Config) lambdaClient {
 	return lambda.New(p, cfgs...)
 }
 
@@ -124,6 +124,7 @@ func getAWSAccountIDFromARN(arn string) string {
 	return accountID
 }
 
+//NewResourceDetector will return an implementation for aws lambda resource detector
 func NewResourceDetector() resource.Detector {
 	return &Lambda{}
 }
