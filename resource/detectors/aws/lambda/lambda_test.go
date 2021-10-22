@@ -25,7 +25,7 @@ func getAWSLambdaARNMock(ctx context.Context, functionName *string) string {
 	return sampleARN
 }
 
-var getLambdaClientMock = func(p client.ConfigProvider, cfgs ...*aws.Config) LambdaClient {
+var getLambdaClientMock = func(p client.ConfigProvider, cfgs ...*aws.Config) lambdaClient {
 	return mock.LambdaMock{
 		Output: &lambda.GetFunctionOutput{
 			Configuration: &lambda.FunctionConfiguration{

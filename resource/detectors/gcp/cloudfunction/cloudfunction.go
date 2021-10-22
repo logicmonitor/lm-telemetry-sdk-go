@@ -19,6 +19,7 @@ var (
 	errNotOnGoogleCloudFunction = errors.New("cannot detect environment variables from Google Cloud Function")
 )
 
+//NewResourceDetector will return an implementation for gcp cloud function resource detector
 func NewResourceDetector() resource.Detector {
 	return &Function{
 		client: gcpImpl{},
@@ -35,10 +36,12 @@ func (gi gcpImpl) gcpProjectID() (string, error) {
 	return metadata.ProjectID()
 }
 
+// Function implements resource.Detector interface for google cloud-function
 type Function struct {
 	client gcpClient
 }
 
+// Detect detects associated resources when running in  cloud function.
 func (f *Function) Detect(ctx context.Context) (*resource.Resource, error) {
 
 	functionName, ok := f.googleCloudFunctionName()

@@ -2,6 +2,7 @@
 
 [![codecov](https://codecov.io/gh/logicmonitor/lm-telemetry-sdk-go/branch/main/graph/badge.svg?token=3UbakzCrzt)](https://codecov.io/gh/logicmonitor/lm-telemetry-sdk-go)
 [![build_and_test](https://github.com/logicmonitor/lm-telemetry-sdk-go/actions/workflows/main.yml/badge.svg)](https://github.com/logicmonitor/lm-telemetry-sdk-go/actions/workflows/main.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/logicmonitor/lm-telemetry-sdk-go.svg)](https://pkg.go.dev/github.com/logicmonitor/lm-telemetry-sdk-go)
 
 _NOTE: This is in private beta._
 
