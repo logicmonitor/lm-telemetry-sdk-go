@@ -17,6 +17,7 @@ const (
 	equalSeperator = "="
 )
 
+//GetServiceDetails gets service details from environment variables
 var GetServiceDetails = func() map[string]string {
 	resourceAttributes := os.Getenv(resourceAttributesKey)
 	if resourceAttributes == "" {
@@ -34,6 +35,7 @@ var GetServiceDetails = func() map[string]string {
 	return attribute
 }
 
+//AddEnvResAttributes adds service attributes from attributeMap to a resource
 var AddEnvResAttributes = func(res *resource.Resource, attributeMap map[string]string) (*resource.Resource, error) {
 	attributes := make([]attribute.KeyValue, 0, 1)
 

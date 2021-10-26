@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	testError = errors.New("test error")
+	errTest = errors.New("test error")
 )
 
 func TestDetect(t *testing.T) {
@@ -45,7 +45,7 @@ func TestDetect(t *testing.T) {
 		defer func() {
 			utils.AddEnvResAttributes = oldAddEnvResAttributes
 		}()
-		utils.AddEnvResAttributes = mock.CreateAddEnvResAttributesMock(resource.Empty(), testError)
+		utils.AddEnvResAttributes = mock.CreateAddEnvResAttributesMock(resource.Empty(), errTest)
 
 		_, err := gce.Detect(context.Background())
 		if err != gceMock.Err {
@@ -56,7 +56,7 @@ func TestDetect(t *testing.T) {
 	t.Run("Error in resource detection", func(t *testing.T) {
 		gceMock := mock.DetectorMock{
 			Res: resource.Empty(),
-			Err: testError,
+			Err: errTest,
 		}
 
 		gce := GCE{

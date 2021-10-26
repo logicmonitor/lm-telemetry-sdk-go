@@ -7,6 +7,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
+//GCPDetectors is a list of resource detector for GCP
 var GCPDetectors []resource.Detector
 
 func init() {

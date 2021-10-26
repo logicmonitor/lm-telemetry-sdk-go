@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
+//AWSDetectors is a list of resource detector for AWS
 var AWSDetectors []resource.Detector
 
 func init() {
