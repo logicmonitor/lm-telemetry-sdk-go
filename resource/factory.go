@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
+//New will auto detect and return a resource
 func New(ctx context.Context) *resource.Resource {
 	var res *resource.Resource
 	var err error

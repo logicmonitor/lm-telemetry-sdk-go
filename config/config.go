@@ -14,6 +14,7 @@ type Config struct {
 	TraceEndpoint          string
 }
 
+//Option option for configuring telemetry setup
 type Option func(*Config)
 
 // NewConfig returns new instance of config

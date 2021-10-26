@@ -12,7 +12,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-/* SetupTelemetry initializes opentelemetry configurations,
+/*SetupTelemetry initializes opentelemetry configurations,
 and takes in context and config.Option(s) as input params.
 Configuration options could be found in config package. */
 func SetupTelemetry(ctx context.Context, opts ...config.Option) error {
