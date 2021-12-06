@@ -30,7 +30,7 @@ of choice. Content-Type would be of application/x-protobuf
 */
 func WithInAppExporter(endpoint string, headers map[string]string) Option {
 	return func(c *Config) {
-		c.InAppCollector = &sdkTraceExporter{
+		c.InAppExporter = &sdkTraceExporter{
 			TraceEndpoint: endpoint,
 			Headers:       headers,
 		}
@@ -39,7 +39,7 @@ func WithInAppExporter(endpoint string, headers map[string]string) Option {
 
 func WithDefaultInAppExporter() Option {
 	return func(c *Config) {
-		if c.InAppCollector == nil {
+		if c.InAppExporter == nil {
 			lmAccount := os.Getenv(lmAccountKey)
 			lmBearerToken := os.Getenv(lmBearerTokenKey)
 
@@ -48,7 +48,7 @@ func WithDefaultInAppExporter() Option {
 				authorizationHeaderKey: fmt.Sprintf(lmTokenHeaderValue, lmBearerToken),
 				xLMAccountHeaderKey:    lmAccount,
 			}
-			c.InAppCollector = &sdkTraceExporter{
+			c.InAppExporter = &sdkTraceExporter{
 				TraceEndpoint: endpoint,
 				Headers:       headers,
 			}

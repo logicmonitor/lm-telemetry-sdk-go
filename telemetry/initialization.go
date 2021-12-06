@@ -41,8 +41,8 @@ func SetupTelemetry(ctx context.Context, opts ...config.Option) error {
 	}
 
 	var traceExporter sdktrace.SpanExporter
-	if c.InAppCollector != nil {
-		traceExporter, err = otlphttpexporter.NewOtlpHttpExporter(c.InAppCollector.TraceEndpoint, c.InAppCollector.Headers)
+	if c.InAppExporter != nil {
+		traceExporter, err = otlphttpexporter.NewOtlpHttpExporter(c.InAppExporter.TraceEndpoint, c.InAppExporter.Headers)
 	} else {
 		traceExporter, err = otlptracehttp.New(ctx,
 			otlptracehttp.WithInsecure(),

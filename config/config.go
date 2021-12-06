@@ -12,7 +12,7 @@ type Config struct {
 	UserResourceAttributes map[string]string
 	Detector               resource.Detector
 	TraceEndpoint          string
-	InAppCollector         *sdkTraceExporter
+	InAppExporter          *sdkTraceExporter
 }
 
 type sdkTraceExporter struct {
