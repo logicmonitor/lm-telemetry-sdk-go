@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/logicmonitor/lm-telemetry-sdk-go/config"
+	"github.com/logicmonitor/lm-telemetry-sdk-go/exporter/otlphttpexporter"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -39,10 +40,15 @@ func SetupTelemetry(ctx context.Context, opts ...config.Option) error {
 		}
 	}
 
-	traceExporter, err := otlptracehttp.New(ctx,
-		otlptracehttp.WithInsecure(),
-		otlptracehttp.WithEndpoint(c.TraceEndpoint),
-	)
+	var traceExporter sdktrace.SpanExporter
+	if c.InAppExporter != nil {
+		traceExporter, err = otlphttpexporter.NewOtlpHttpExporter(c.InAppExporter.TraceEndpoint, c.InAppExporter.Headers)
+	} else {
+		traceExporter, err = otlptracehttp.New(ctx,
+			otlptracehttp.WithInsecure(),
+			otlptracehttp.WithEndpoint(c.TraceEndpoint),
+		)
+	}
 	if err != nil {
 		return err
 	}

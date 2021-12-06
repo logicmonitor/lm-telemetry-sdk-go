@@ -12,6 +12,12 @@ type Config struct {
 	UserResourceAttributes map[string]string
 	Detector               resource.Detector
 	TraceEndpoint          string
+	InAppExporter          *sdkTraceExporter
+}
+
+type sdkTraceExporter struct {
+	TraceEndpoint string
+	Headers       map[string]string
 }
 
 //Option option for configuring telemetry setup
