@@ -18,12 +18,3 @@ func WithAWSEC2Detector() Option {
 		c.Detector = ec2.NewResourceDetector()
 	}
 }
-
-/*WithHTTPTraceEndpoint returns a config option which sets
-trace endpoint
-*/
-func WithHTTPTraceEndpoint(endpoint string) Option {
-	return func(c *Config) {
-		c.TraceEndpoint = endpoint
-	}
-}
