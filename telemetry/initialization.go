@@ -53,7 +53,7 @@ func SetupTelemetry(ctx context.Context, opts ...config.Option) error {
 		return err
 	}
 
-	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
+	bsp := sdktrace.NewSimpleSpanProcessor(traceExporter)
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithResource(res),
