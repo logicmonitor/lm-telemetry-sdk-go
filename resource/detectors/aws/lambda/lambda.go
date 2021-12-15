@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/client"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -97,29 +97,17 @@ func awsLambdaExecutionEnvironment() string {
 }
 
 var getAWSLambdaARN = func(ctx context.Context, functionName *string) string {
-	arn := ctx.Value(arnKey)
-	if arn != nil {
-		arnStr, ok := arn.(string)
-		if ok {
-			return arnStr
-		}
+	lc, ok := lambdacontext.FromContext(ctx)
+	if ok {
+		return lc.InvokedFunctionArn
 	}
-	mySession := session.Must(session.NewSession())
-	awsLambda := getLambdaClient(mySession)
-
-	input := lambda.GetFunctionInput{
-		FunctionName: functionName,
-	}
-
-	output, err := awsLambda.GetFunction(&input)
-	if err != nil {
-		return ""
-	}
-	return *output.Configuration.FunctionArn
-
+	return ""
 }
 
 func getAWSAccountIDFromARN(arn string) string {
+	if arn == "" {
+		return ""
+	}
 	accountID := strings.Split(arn, colonSeperator)[4]
 	return accountID
 }
