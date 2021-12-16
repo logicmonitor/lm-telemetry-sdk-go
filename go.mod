@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go v0.88.0
+	github.com/aws/aws-lambda-go v1.27.1 // indirect
 	github.com/aws/aws-sdk-go v1.40.41
 	github.com/stretchr/testify v1.7.0
 	go.opentelemetry.io/contrib/detectors/aws v0.22.0
