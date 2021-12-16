@@ -53,11 +53,17 @@ func SetupTelemetry(ctx context.Context, opts ...config.Option) error {
 		return err
 	}
 
-	bsp := sdktrace.NewSimpleSpanProcessor(traceExporter)
+	var sp sdktrace.SpanProcessor
+	if c.SpanProcessor == nil {
+		sp = sdktrace.NewBatchSpanProcessor(traceExporter)
+	} else {
+		sp = c.SpanProcessor(traceExporter)
+	}
+
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithResource(res),
-		sdktrace.WithSpanProcessor(bsp),
+		sdktrace.WithSpanProcessor(sp),
 	)
 	otel.SetTracerProvider(tracerProvider)
 	otel.SetTextMapPropagator(propagation.TraceContext{})

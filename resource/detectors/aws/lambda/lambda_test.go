@@ -70,25 +70,3 @@ func TestDetect(t *testing.T) {
 		}
 	})
 }
-
-func TestGetAWSLambdaARN(t *testing.T) {
-	oldgetLambdaClient := getLambdaClient
-	defer func() {
-		getLambdaClient = oldgetLambdaClient
-	}()
-	getLambdaClient = getLambdaClientMock
-
-	t.Run("ARN in  context", func(t *testing.T) {
-		ctx := context.WithValue(context.Background(), arnKey, sampleARN)
-		functionName := "function-1"
-		arn := getAWSLambdaARN(ctx, &functionName)
-		if arn != sampleARN {
-			t.Fatal("ARN value is not equal to expected one")
-		}
-	})
-
-	t.Run("Successful ARN", func(t *testing.T) {
-		functionName := "function-1"
-		getAWSLambdaARN(context.Background(), &functionName)
-	})
-}

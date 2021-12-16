@@ -5,6 +5,7 @@ import (
 
 	lmresource "github.com/logicmonitor/lm-telemetry-sdk-go/resource"
 	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 //Config represents opentelemetry configurations
@@ -13,6 +14,7 @@ type Config struct {
 	Detector               resource.Detector
 	TraceEndpoint          string
 	InAppExporter          *sdkTraceExporter
+	SpanProcessor          func(sdktrace.SpanExporter) sdktrace.SpanProcessor
 }
 
 type sdkTraceExporter struct {
