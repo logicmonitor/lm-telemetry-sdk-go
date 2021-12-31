@@ -14,9 +14,9 @@ var AWSDetectors []resource.Detector
 func init() {
 	AWSDetectors = make([]resource.Detector, 0, 1)
 	AWSDetectors = append(AWSDetectors,
-		ec2.NewResourceDetector(),
-		ecs.NewResourceDetector(),
 		eks.NewResourceDetector(),
+		ecs.NewResourceDetector(),
+		ec2.NewResourceDetector(),
 		lambda.NewResourceDetector(),
 	)
 }
