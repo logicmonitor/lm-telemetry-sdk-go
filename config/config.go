@@ -36,5 +36,5 @@ type defaultDetector struct {
 }
 
 func (dd *defaultDetector) Detect(ctx context.Context) (*resource.Resource, error) {
-	return lmresource.New(ctx), nil
+	return lmresource.New(ctx)
 }
