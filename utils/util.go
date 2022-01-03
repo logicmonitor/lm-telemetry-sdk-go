@@ -35,6 +35,14 @@ var GetServiceDetails = func() map[string]string {
 	return attribute
 }
 
+var GetAttributesfromMap = func(attributeMap map[string]string) []attribute.KeyValue {
+	attributeList := []attribute.KeyValue{}
+	for key, value := range attributeMap {
+		attributeList = append(attributeList, attribute.Key(key).String(value))
+	}
+	return attributeList
+}
+
 //AddEnvResAttributes adds service attributes from attributeMap to a resource
 var AddEnvResAttributes = func(res *resource.Resource, attributeMap map[string]string) (*resource.Resource, error) {
 	attributes := make([]attribute.KeyValue, 0, 1)

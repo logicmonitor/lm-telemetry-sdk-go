@@ -3,15 +3,16 @@ package ec2
 import (
 	"context"
 	"fmt"
+	"net/http"
 
-	otelcontribaws "go.opentelemetry.io/contrib/detectors/aws"
-	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
-
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/utils"
+	otelcontribaws "go.opentelemetry.io/contrib/detectors/aws"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/resource"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
 const (
@@ -26,8 +27,16 @@ func NewResourceDetector() resource.Detector {
 	}
 }
 
+// Client implements methods to capture EC2 environment metadata information
+type Client interface {
+	Available() bool
+	GetInstanceIdentityDocument() (ec2metadata.EC2InstanceIdentityDocument, error)
+	GetMetadata(p string) (string, error)
+}
+
 //EC2 implements resource.Detector interface, for an ec2 instance
 type EC2 struct {
+	c       Client
 	otelAWS resource.Detector
 }
 
@@ -35,42 +44,88 @@ type EC2 struct {
 Detect will return a resource instance which will have attributes describing,
 an ec2 instance
 */
-func (ec2 *EC2) Detect(ctx context.Context) (*resource.Resource, error) {
-	awsRes, err := ec2.otelAWS.Detect(ctx)
+func (detector *EC2) Detect(ctx context.Context) (*resource.Resource, error) {
+	client, err := detector.client()
 	if err != nil {
-		return awsRes, err
-	} else if awsRes == nil {
 		return nil, err
 	}
-	attributes := make([]attribute.KeyValue, 0, 1)
-	identityDocument, err := getEc2InstanceIdentityDocument()
-	if err == nil {
-		privateIPattribute := attribute.Key("private.IP").String(identityDocument.PrivateIP)
-		attributes = append(attributes, privateIPattribute)
+
+	if !client.Available() {
+		return nil, nil
 	}
 
-	attributes = append(attributes, semconv.CloudPlatformAWSEC2)
+	doc, err := client.GetInstanceIdentityDocument()
+	if err != nil {
+		return nil, err
+	}
 
-	ec2Arn := fmt.Sprintf(ec2ArnFormat, identityDocument.Region, identityDocument.AccountID, identityDocument.InstanceID)
+	attributes := []attribute.KeyValue{
+		semconv.CloudProviderAWS,
+		semconv.CloudPlatformAWSEC2,
+		semconv.CloudRegionKey.String(doc.Region),
+		semconv.CloudAvailabilityZoneKey.String(doc.AvailabilityZone),
+		semconv.CloudAccountIDKey.String(doc.AccountID),
+		semconv.HostIDKey.String(doc.InstanceID),
+		semconv.HostImageIDKey.String(doc.ImageID),
+		semconv.HostTypeKey.String(doc.InstanceType),
+	}
+
+	m := &metadata{client: client}
+	m.add(semconv.HostNameKey, "hostname")
+
+	attributes = append(attributes, m.attributes...)
+
+	if len(m.errs) > 0 {
+		err = fmt.Errorf("%w: %s", resource.ErrPartialResource, m.errs)
+	}
+
+	ec2Arn := fmt.Sprintf(ec2ArnFormat, doc.Region, doc.AccountID, doc.InstanceID)
 	arnAttribute := attribute.Key(awsARN).String(ec2Arn)
 	attributes = append(attributes, arnAttribute)
 
-	res := resource.NewSchemaless(attributes...)
-
 	envAttributes := utils.GetServiceDetails()
-	mergedRes, err := utils.AddEnvResAttributes(res, envAttributes)
-	if err != nil {
-		return resource.Merge(awsRes, res)
-	}
+	attributes = append(attributes, utils.GetAttributesfromMap(envAttributes)...)
+	attributes = append(attributes, semconv.CloudPlatformAWSEC2)
 
-	return resource.Merge(awsRes, mergedRes)
+	return resource.NewWithAttributes(semconv.SchemaURL, attributes...), err
+
 }
 
-var getEc2InstanceIdentityDocument = func() (ec2metadata.EC2InstanceIdentityDocument, error) {
-	s, err := session.NewSession()
-	if err != nil {
-		return ec2metadata.EC2InstanceIdentityDocument{}, err
+func (detector *EC2) client() (Client, error) {
+	if detector.c != nil {
+		return detector.c, nil
 	}
 
-	return ec2metadata.New(s).GetInstanceIdentityDocument()
+	s, err := session.NewSession()
+	if err != nil {
+		return nil, err
+	}
+
+	return ec2metadata.New(s), nil
+}
+
+type metadata struct {
+	client     Client
+	errs       []error
+	attributes []attribute.KeyValue
+}
+
+func (m *metadata) add(k attribute.Key, n string) {
+	v, err := m.client.GetMetadata(n)
+	if err == nil {
+		m.attributes = append(m.attributes, k.String(v))
+		return
+	}
+
+	rf, ok := err.(awserr.RequestFailure)
+	if !ok {
+		m.errs = append(m.errs, fmt.Errorf("%q: %w", n, err))
+		return
+	}
+
+	if rf.StatusCode() == http.StatusNotFound {
+		return
+	}
+
+	m.errs = append(m.errs, fmt.Errorf("%q: %d %s", n, rf.StatusCode(), rf.Code()))
 }
