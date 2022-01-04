@@ -71,3 +71,19 @@ ctx := context.Background()
 resource,err := lmLambdaDetector.Detect(ctx)
 
 ```
+
+
+### Resource Detector env config
+
+Environment variable `LM_RESOURCE_DETECTOR` must be set to one of the following values, to set appropriate resource detector
+
+| Value                     | Description|
+|---------------------------|-------------------------------------|
+| `aws_ec2`                 | AWS Elastic Compute Cloud |
+| `aws_ecs`                 | AWS Elastic Container Service |
+| `aws_eks`                 | AWS Elastic Kubernetes Service |
+| `aws_lambda`              | AWS Lambda |
+| `gcp_compute_engine`      | Google Cloud Compute Engine (GCE) |
+| `gcp_kubernetes_engine`   | Google Cloud Kubernetes Engine (GKE) |
+| `gcp_cloud_functions`     | Google Cloud Functions (GCF) |
+
