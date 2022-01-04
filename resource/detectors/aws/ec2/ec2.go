@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/utils"
-	otelcontribaws "go.opentelemetry.io/contrib/detectors/aws"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
@@ -22,9 +21,7 @@ const (
 
 //NewResourceDetector will return an implementation for aws ec2 resource detector
 func NewResourceDetector() resource.Detector {
-	return &EC2{
-		otelAWS: &otelcontribaws.AWS{},
-	}
+	return &EC2{}
 }
 
 // Client implements methods to capture EC2 environment metadata information
@@ -36,8 +33,7 @@ type Client interface {
 
 //EC2 implements resource.Detector interface, for an ec2 instance
 type EC2 struct {
-	c       Client
-	otelAWS resource.Detector
+	c Client
 }
 
 /*
