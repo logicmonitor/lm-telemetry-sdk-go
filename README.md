@@ -71,3 +71,14 @@ ctx := context.Background()
 resource,err := lmLambdaDetector.Detect(ctx)
 
 ```
+
+
+##### Resource Detector env config
+
+Use following environment variable values to configure resource detector.
+ENV variable - LM_RESOURCE_DETECTOR
+
+| Resource Type | Value|
+|---------------|------|
+|AWS_EC2        |aws_ec2|
+
