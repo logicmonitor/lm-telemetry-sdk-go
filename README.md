@@ -77,7 +77,10 @@ resource,err := lmLambdaDetector.Detect(ctx)
 
 Environment variable `LM_RESOURCE_DETECTOR` must be set to one of the following values, to set appropriate resource detector
 
-| Resource Type | Value|
-|---------------|------|
-|AWS_EC2        |aws_ec2|
+| Value         | Description|
+|---------------|-------------------------------------|
+| `aws_ec2`     | AWS Elastic Compute Cloud |
+| `aws_ecs`     | AWS Elastic Container Service |
+| `aws_eks`     | AWS Elastic Kubernetes Service |
+| `aws_lambda`  | AWS Lambda |
 
