@@ -75,8 +75,7 @@ resource,err := lmLambdaDetector.Detect(ctx)
 
 ##### Resource Detector env config
 
-Use following environment variable values to configure resource detector
-ENV variable - LM_RESOURCE_DETECTOR
+Environment variable `LM_RESOURCE_DETECTOR` must be set to one of the following values, to set appropriate resource detector
 
 | Resource Type | Value|
 |---------------|------|
