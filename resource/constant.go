@@ -7,6 +7,6 @@ const (
 	AWS_ECS    = "aws_ecs"
 
 	GCP_GCE             = "gcp_compute_engine"
-	GCP_CLOUD_FUNCTIONS = "gcp_cloud_functions"
 	GCP_GKE             = "gcp_kubernetes_engine"
+	GCP_CLOUD_FUNCTIONS = "gcp_cloud_functions"
 )
