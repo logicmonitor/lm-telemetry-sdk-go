@@ -73,7 +73,7 @@ resource,err := lmLambdaDetector.Detect(ctx)
 ```
 
 
-##### Resource Detector env config
+### Resource Detector env config
 
 Environment variable `LM_RESOURCE_DETECTOR` must be set to one of the following values, to set appropriate resource detector
 
