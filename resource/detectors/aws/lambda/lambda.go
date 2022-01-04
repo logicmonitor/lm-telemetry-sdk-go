@@ -7,9 +7,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/client"
-	"github.com/aws/aws-sdk-go/service/lambda"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
@@ -19,26 +16,13 @@ const (
 	executionEnvironmentKey = "AWS_EXECUTION_ENV"
 	functionName            = "AWS_LAMBDA_FUNCTION_NAME"
 	region                  = "AWS_REGION"
-	//executionEnvionment     = "AWS_EXECUTION_ENV"
-	functionVersion = "AWS_LAMBDA_FUNCTION_VERSION"
-	colonSeperator  = ":"
+	functionVersion         = "AWS_LAMBDA_FUNCTION_VERSION"
+	colonSeperator          = ":"
 )
-
-type ctxArnKey string
-
-const arnKey ctxArnKey = "InvokedFunctionArn"
 
 var (
 	errNotOnLambda = errors.New("process is not on Lambda, cannot detect environment variables from lambda")
 )
-
-type lambdaClient interface {
-	GetFunction(input *lambda.GetFunctionInput) (*lambda.GetFunctionOutput, error)
-}
-
-var getLambdaClient = func(p client.ConfigProvider, cfgs ...*aws.Config) lambdaClient {
-	return lambda.New(p, cfgs...)
-}
 
 //Lambda implements, resource.Detector for aws lambda
 type Lambda struct {

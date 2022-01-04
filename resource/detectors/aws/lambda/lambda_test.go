@@ -4,11 +4,6 @@ import (
 	"context"
 	"os"
 	"testing"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/client"
-	"github.com/aws/aws-sdk-go/service/lambda"
-	"github.com/logicmonitor/lm-telemetry-sdk-go/mock"
 )
 
 var (
@@ -23,16 +18,6 @@ func CreateIsAWSLambdaMock(islambda bool) func() bool {
 
 func getAWSLambdaARNMock(ctx context.Context, functionName *string) string {
 	return sampleARN
-}
-
-var getLambdaClientMock = func(p client.ConfigProvider, cfgs ...*aws.Config) lambdaClient {
-	return mock.LambdaMock{
-		Output: &lambda.GetFunctionOutput{
-			Configuration: &lambda.FunctionConfiguration{
-				FunctionArn: &sampleARN,
-			},
-		},
-	}
 }
 
 func TestDetect(t *testing.T) {
