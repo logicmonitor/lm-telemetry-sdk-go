@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"os"
-	"strings"
 
 	"cloud.google.com/go/compute/metadata"
 	"go.opentelemetry.io/otel/attribute"
