@@ -40,12 +40,6 @@ func (gi gcpImpl) gcpProjectID() (string, error) {
 
 func (gi gcpImpl) gcpRegion() (string, error) {
 	region, err := metadata.Zone()
-	if region != "" {
-		splitArr := strings.SplitN(region, "-", 3)
-		if len(splitArr) == 3 {
-			region = strings.Join(splitArr[0:2], "-")
-		}
-	}
 	return region, err
 }
 
