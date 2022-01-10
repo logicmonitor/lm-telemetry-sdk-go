@@ -13,12 +13,18 @@ var (
 )
 
 type gcpMock struct {
-	ProjectID string
-	Err       error
+	ProjectID    string
+	ProjectIDErr error
+	Region       string
+	RegionErr    error
 }
 
 func (gi gcpMock) gcpProjectID() (string, error) {
-	return gi.ProjectID, gi.Err
+	return gi.ProjectID, gi.ProjectIDErr
+}
+
+func (gi gcpMock) gcpRegion() (string, error) {
+	return gi.Region, gi.RegionErr
 }
 
 func TestDetect(t *testing.T) {
@@ -36,8 +42,10 @@ func TestDetect(t *testing.T) {
 	t.Run("Success Case", func(t *testing.T) {
 		detector := Function{
 			client: gcpMock{
-				ProjectID: "someID",
-				Err:       nil,
+				ProjectID:    "someID",
+				ProjectIDErr: nil,
+				Region:       "some-region",
+				RegionErr:    nil,
 			},
 		}
 
@@ -49,15 +57,30 @@ func TestDetect(t *testing.T) {
 
 	t.Run("error in getting projectID", func(t *testing.T) {
 		mockClient := gcpMock{
-			ProjectID: "someID",
-			Err:       errTest,
+			ProjectID:    "someID",
+			ProjectIDErr: errTest,
 		}
 		detector := Function{
 			client: mockClient,
 		}
 
 		_, err := detector.Detect(context.Background())
-		if err != mockClient.Err {
+		if err != mockClient.ProjectIDErr {
+			t.Fatal("unexpected error :", err)
+		}
+	})
+
+	t.Run("error in getting region", func(t *testing.T) {
+		mockClient := gcpMock{
+			Region:    "",
+			RegionErr: errTest,
+		}
+		detector := Function{
+			client: mockClient,
+		}
+
+		_, err := detector.Detect(context.Background())
+		if err != mockClient.RegionErr {
 			t.Fatal("unexpected error :", err)
 		}
 	})
