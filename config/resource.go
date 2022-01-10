@@ -1,9 +1,10 @@
 package config
 
-import(
+import (
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/aws/ec2"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/aws/lambda"
-) 
+	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/gcp/cloudfunction"
+)
 
 /*WithAttributes returns a config option which adds
 custom attributes to resource */
@@ -28,5 +29,14 @@ config detector to ec2 detector
 func WithAWSLambdaDetector() Option {
 	return func(c *Config) {
 		c.Detector = lambda.NewResourceDetector()
+	}
+}
+
+/*WithGCPcloudFunctionDetector returns a config option which sets
+config detector to gcloud function detector
+*/
+func WithGCPcloudFunctionDetector() Option {
+	return func(c *Config) {
+		c.Detector = cloudfunction.NewResourceDetector()
 	}
 }
