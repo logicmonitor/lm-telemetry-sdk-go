@@ -32,6 +32,9 @@ func WithAWSLambdaDetector() Option {
 	}
 }
 
+/*WithGCPcloudFunctionDetector returns a config option which sets
+config detector to gcloud function detector
+*/
 func WithGCPcloudFunctionDetector() Option {
 	return func(c *Config) {
 		c.Detector = cloudfunction.NewResourceDetector()
