@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/compute/metadata"
 	"go.opentelemetry.io/otel/attribute"
@@ -28,12 +29,24 @@ func NewResourceDetector() resource.Detector {
 
 type gcpClient interface {
 	gcpProjectID() (string, error)
+	gcpRegion() (string, error)
 }
 
 type gcpImpl struct{}
 
 func (gi gcpImpl) gcpProjectID() (string, error) {
 	return metadata.ProjectID()
+}
+
+func (gi gcpImpl) gcpRegion() (string, error) {
+	region, err := metadata.Zone()
+	if region != "" {
+		splitArr := strings.SplitN(region, "-", 3)
+		if len(splitArr) == 3 {
+			region = strings.Join(splitArr[0:2], "-")
+		}
+	}
+	return region, err
 }
 
 // Function implements resource.Detector interface for google cloud-function
@@ -54,10 +67,17 @@ func (f *Function) Detect(ctx context.Context) (*resource.Resource, error) {
 		return nil, err
 	}
 
+	region, err := f.client.gcpRegion()
+	if err != nil {
+		return nil, err
+	}
+
 	attributes := []attribute.KeyValue{
 		semconv.CloudProviderGCP,
+		semconv.CloudPlatformGCPCloudFunctions,
 		attribute.String(string(semconv.FaaSNameKey), functionName),
-		attribute.String("gcp.projectID", projectID),
+		semconv.CloudAccountIDKey.String(projectID),
+		semconv.CloudRegionKey.String(region),
 	}
 	return resource.NewSchemaless(attributes...), nil
 }
