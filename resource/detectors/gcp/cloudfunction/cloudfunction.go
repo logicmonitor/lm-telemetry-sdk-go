@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/compute/metadata"
 	"go.opentelemetry.io/otel/attribute"
@@ -38,7 +39,14 @@ func (gi gcpImpl) gcpProjectID() (string, error) {
 }
 
 func (gi gcpImpl) gcpRegion() (string, error) {
-	region, err := metadata.Zone()
+	var region string
+	zone, err := metadata.Zone()
+	if zone != "" {
+		splitArr := strings.SplitN(zone, "-", 3)
+		if len(splitArr) == 3 {
+			region = strings.Join(splitArr[0:2], "-")
+		}
+	}
 	return region, err
 }
 
