@@ -7,6 +7,10 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/client"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/lambda"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
@@ -23,6 +27,14 @@ const (
 var (
 	errNotOnLambda = errors.New("process is not on Lambda, cannot detect environment variables from lambda")
 )
+
+type lambdaClient interface {
+	GetFunction(input *lambda.GetFunctionInput) (*lambda.GetFunctionOutput, error)
+}
+
+var getLambdaClient = func(p client.ConfigProvider, cfgs ...*aws.Config) lambdaClient {
+	return lambda.New(p, cfgs...)
+}
 
 //Lambda implements, resource.Detector for aws lambda
 type Lambda struct {
@@ -85,7 +97,18 @@ var getAWSLambdaARN = func(ctx context.Context, functionName *string) string {
 	if ok {
 		return lc.InvokedFunctionArn
 	}
-	return ""
+	mySession := session.Must(session.NewSession())
+	awsLambda := getLambdaClient(mySession)
+
+	input := lambda.GetFunctionInput{
+		FunctionName: functionName,
+	}
+
+	output, err := awsLambda.GetFunction(&input)
+	if err != nil {
+		return ""
+	}
+	return *output.Configuration.FunctionArn
 }
 
 func getAWSAccountIDFromARN(arn string) string {
