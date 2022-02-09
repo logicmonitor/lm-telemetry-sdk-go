@@ -4,13 +4,11 @@ import (
 	"context"
 	"errors"
 	"os"
-	"strings"
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/client"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/aws/aws-sdk-go/service/sts"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
@@ -22,6 +20,8 @@ const (
 	region                  = "AWS_REGION"
 	functionVersion         = "AWS_LAMBDA_FUNCTION_VERSION"
 	colonSeperator          = ":"
+
+	//arnFormat = "arn:aws:lambda:%s:%s:function:%s" //arn:aws:lambda:<region>:<account-id>:function:<name>
 )
 
 var (
@@ -30,10 +30,6 @@ var (
 
 type lambdaClient interface {
 	GetFunction(input *lambda.GetFunctionInput) (*lambda.GetFunctionOutput, error)
-}
-
-var getLambdaClient = func(p client.ConfigProvider, cfgs ...*aws.Config) lambdaClient {
-	return lambda.New(p, cfgs...)
 }
 
 //Lambda implements, resource.Detector for aws lambda
@@ -48,19 +44,24 @@ func (lm *Lambda) Detect(ctx context.Context) (*resource.Resource, error) {
 
 	functionName := awsLambdafuncName()
 	awsRegion := awsRegion()
-	executionEnvironment := awsLambdaExecutionEnvironment()
 	functionVersion := lambdaFunctionVersion()
-	functionID := getAWSLambdaARN(ctx, &functionName)
-	accountID := getAWSAccountIDFromARN(functionID)
+	functionID := getAWSLambdaARN(ctx)
+	accountID, _ := getAWSAccountID()
 
 	attributes := []attribute.KeyValue{
 		semconv.CloudProviderAWS,
-		attribute.String(string(semconv.FaaSNameKey), functionName),
-		attribute.String(string(semconv.FaaSInstanceKey), executionEnvironment),
-		attribute.String(string(semconv.FaaSVersionKey), functionVersion),
-		attribute.String(string(semconv.FaaSIDKey), functionID),
-		attribute.String(string(semconv.CloudAccountIDKey), accountID),
-		attribute.String(string(semconv.CloudRegionKey), awsRegion),
+		semconv.CloudPlatformAWSLambda,
+	}
+
+	if functionID != "" {
+		attributes = append(attributes, attribute.String(string(semconv.FaaSIDKey), functionID))
+	} else {
+		attributes = append(attributes, []attribute.KeyValue{
+			attribute.String(string(semconv.FaaSNameKey), functionName),
+			attribute.String(string(semconv.CloudAccountIDKey), accountID),
+			attribute.String(string(semconv.CloudRegionKey), awsRegion),
+			attribute.String(string(semconv.FaaSVersionKey), functionVersion),
+		}...)
 	}
 
 	return resource.NewSchemaless(attributes...), nil
@@ -87,36 +88,27 @@ func lambdaFunctionVersion() string {
 	return version
 }
 
-func awsLambdaExecutionEnvironment() string {
-	executionEnv, _ := os.LookupEnv(executionEnvironmentKey)
-	return executionEnv
-}
-
-var getAWSLambdaARN = func(ctx context.Context, functionName *string) string {
+var getAWSLambdaARN = func(ctx context.Context) string {
 	lc, ok := lambdacontext.FromContext(ctx)
 	if ok {
 		return lc.InvokedFunctionArn
 	}
-	mySession := session.Must(session.NewSession())
-	awsLambda := getLambdaClient(mySession)
-
-	input := lambda.GetFunctionInput{
-		FunctionName: functionName,
-	}
-
-	output, err := awsLambda.GetFunction(&input)
-	if err != nil {
-		return ""
-	}
-	return *output.Configuration.FunctionArn
+	return ""
 }
 
-func getAWSAccountIDFromARN(arn string) string {
-	if arn == "" {
-		return ""
+func getAWSAccountID() (string, error) {
+	sess, err := session.NewSession()
+	if err != nil {
+		return "", err
 	}
-	accountID := strings.Split(arn, colonSeperator)[4]
-	return accountID
+	svc := sts.New(sess)
+	input := &sts.GetCallerIdentityInput{}
+	result, err := svc.GetCallerIdentity(input)
+	if err != nil {
+		return "", err
+	}
+	return *result.Account, nil
+
 }
 
 //NewResourceDetector will return an implementation for aws lambda resource detector
