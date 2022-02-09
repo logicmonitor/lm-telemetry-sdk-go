@@ -14,13 +14,9 @@ import (
 )
 
 const (
-	executionEnvironmentKey = "AWS_EXECUTION_ENV"
-	functionName            = "AWS_LAMBDA_FUNCTION_NAME"
-	region                  = "AWS_REGION"
-	functionVersion         = "AWS_LAMBDA_FUNCTION_VERSION"
-	colonSeperator          = ":"
-
-	//arnFormat = "arn:aws:lambda:%s:%s:function:%s" //arn:aws:lambda:<region>:<account-id>:function:<name>
+	functionName    = "AWS_LAMBDA_FUNCTION_NAME"
+	region          = "AWS_REGION"
+	functionVersion = "AWS_LAMBDA_FUNCTION_VERSION"
 )
 
 var (
