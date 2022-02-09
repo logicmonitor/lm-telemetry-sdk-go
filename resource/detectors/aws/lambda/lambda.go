@@ -7,7 +7,6 @@ import (
 
 	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -28,8 +27,13 @@ var (
 	errNotOnLambda = errors.New("process is not on Lambda, cannot detect environment variables from lambda")
 )
 
-type lambdaClient interface {
-	GetFunction(input *lambda.GetFunctionInput) (*lambda.GetFunctionOutput, error)
+type Client interface {
+	GetCallerIdentity(input *sts.GetCallerIdentityInput) (*sts.GetCallerIdentityOutput, error)
+}
+
+var getClient = func() Client {
+	sess, _ := session.NewSession()
+	return sts.New(sess)
 }
 
 //Lambda implements, resource.Detector for aws lambda
@@ -97,18 +101,13 @@ var getAWSLambdaARN = func(ctx context.Context) string {
 }
 
 func getAWSAccountID() (string, error) {
-	sess, err := session.NewSession()
-	if err != nil {
-		return "", err
-	}
-	svc := sts.New(sess)
+	svc := getClient()
 	input := &sts.GetCallerIdentityInput{}
 	result, err := svc.GetCallerIdentity(input)
 	if err != nil {
 		return "", err
 	}
 	return *result.Account, nil
-
 }
 
 //NewResourceDetector will return an implementation for aws lambda resource detector
