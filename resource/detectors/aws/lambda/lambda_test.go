@@ -5,14 +5,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/client"
-	"github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/aws/aws-lambda-go/lambdacontext"
+	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/mock"
 )
 
 var (
-	sampleARN = "arn:aws:lambda:us-east-2:123456789012:function:my-function:1"
+	sampleARN       = "arn:aws:lambda:us-east-2:123456789012:function:my-function:1"
+	sampleAccountID = "1234567890"
 )
 
 func CreateIsAWSLambdaMock(islambda bool) func() bool {
@@ -21,16 +21,14 @@ func CreateIsAWSLambdaMock(islambda bool) func() bool {
 	}
 }
 
-func getAWSLambdaARNMock(ctx context.Context, functionName *string) string {
+func getAWSLambdaARNMock(ctx context.Context) string {
 	return sampleARN
 }
 
-var getLambdaClientMock = func(p client.ConfigProvider, cfgs ...*aws.Config) lambdaClient {
+var getLambdaClientMock = func() Client {
 	return mock.LambdaMock{
-		Output: &lambda.GetFunctionOutput{
-			Configuration: &lambda.FunctionConfiguration{
-				FunctionArn: &sampleARN,
-			},
+		Output: &sts.GetCallerIdentityOutput{
+			Account: &sampleAccountID,
 		},
 	}
 }
@@ -69,26 +67,55 @@ func TestDetect(t *testing.T) {
 			t.Fatalf("Getting error: %v", err)
 		}
 	})
+
+	t.Run("AWS arn not found", func(t *testing.T) {
+		oldgetAWSLambdaARN := getAWSLambdaARN
+		getAWSLambdaARN = func(ctx context.Context) string {
+			return ""
+		}
+		defer func() {
+			getAWSLambdaARN = oldgetAWSLambdaARN
+		}()
+		_, err := lambdaDetector.Detect(context.Background())
+		if err != nil {
+			t.Fatalf("Getting error: %v", err)
+		}
+
+	})
 }
 
 func TestGetAWSLambdaARN(t *testing.T) {
-	oldgetLambdaClient := getLambdaClient
-	defer func() {
-		getLambdaClient = oldgetLambdaClient
-	}()
-	getLambdaClient = getLambdaClientMock
 
-	// t.Run("ARN in  context", func(t *testing.T) {
-	// 	ctx := context.WithValue(context.Background(), arnKey, sampleARN)
-	// 	functionName := "function-1"
-	// 	arn := getAWSLambdaARN(ctx, &functionName)
-	// 	if arn != sampleARN {
-	// 		t.Fatal("ARN value is not equal to expected one")
-	// 	}
-	// })
-
-	t.Run("Successful ARN", func(t *testing.T) {
-		functionName := "function-1"
-		getAWSLambdaARN(context.Background(), &functionName)
+	t.Run("with lambdaContext", func(t *testing.T) {
+		lambdaContext := lambdacontext.LambdaContext{
+			InvokedFunctionArn: sampleARN,
+		}
+		arn := getAWSLambdaARN(lambdacontext.NewContext(context.Background(), &lambdaContext))
+		if arn != sampleARN {
+			t.Fatalf("expected arn=%s, rcvd arn = %s", sampleARN, arn)
+		}
 	})
+
+	t.Run("without lambdaContext", func(t *testing.T) {
+		arn := getAWSLambdaARN(context.Background())
+		if arn != "" {
+			t.Fatalf("expected arn=%s, rcvd arn = %s", sampleARN, arn)
+		}
+	})
+}
+
+func TestGetAWSAccountID(t *testing.T) {
+	oldgetClient := getClient
+	defer func() {
+		getClient = oldgetClient
+	}()
+	getClient = getLambdaClientMock
+
+	t.Run("success", func(t *testing.T) {
+		accountID, err := getAWSAccountID()
+		if err != nil || accountID != sampleAccountID {
+			t.Fatalf("expected account_id = %s, rcvd account_id = %s ; expected error = %v, rcvd error = %v", sampleAccountID, accountID, nil, err)
+		}
+	})
+
 }
