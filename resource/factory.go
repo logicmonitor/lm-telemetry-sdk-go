@@ -11,6 +11,8 @@ import (
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/aws/ecs"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/aws/eks"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/aws/lambda"
+	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/azure"
+	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/azure/vm"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/gcp"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/gcp/cloudfunction"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/gcp/gce"
@@ -45,6 +47,8 @@ func New(ctx context.Context) (*resource.Resource, error) {
 		detector = gke.NewResourceDetector()
 	case GCP_CLOUD_FUNCTIONS:
 		detector = cloudfunction.NewResourceDetector()
+	case AZURE_VM:
+		detector = vm.NewResourceDetector()
 	}
 
 	if detector != nil {
@@ -62,6 +66,14 @@ func New(ctx context.Context) (*resource.Resource, error) {
 	//GCP
 	for _, gcpDetector := range gcp.GCPDetectors {
 		res, err = gcpDetector.Detect(ctx)
+		if res != nil && err == nil {
+			return res, nil
+		}
+	}
+
+	//Azure
+	for _, azureDetector := range azure.AzureDetectors {
+		res, err = azureDetector.Detect(ctx)
 		if res != nil && err == nil {
 			return res, nil
 		}
