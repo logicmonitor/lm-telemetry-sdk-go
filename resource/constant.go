@@ -9,4 +9,6 @@ const (
 	GCP_GCE             = "gcp_compute_engine"
 	GCP_GKE             = "gcp_kubernetes_engine"
 	GCP_CLOUD_FUNCTIONS = "gcp_cloud_functions"
+
+	AZURE_VM = "azure_vm"
 )

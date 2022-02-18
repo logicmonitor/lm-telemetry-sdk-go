@@ -16,7 +16,7 @@ func init() {
 	AWSDetectors = append(AWSDetectors,
 		eks.NewResourceDetector(),
 		ecs.NewResourceDetector(),
-		ec2.NewResourceDetector(),
 		lambda.NewResourceDetector(),
+		ec2.NewResourceDetector(),
 	)
 }
