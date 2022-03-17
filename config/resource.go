@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/aws/ec2"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/aws/lambda"
+	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/azure/vm"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/resource/detectors/gcp/cloudfunction"
 )
 
@@ -38,5 +39,11 @@ config detector to gcloud function detector
 func WithGCPcloudFunctionDetector() Option {
 	return func(c *Config) {
 		c.Detector = cloudfunction.NewResourceDetector()
+	}
+}
+
+func WithAureVMDetector() Option {
+	return func(c *Config) {
+		c.Detector = vm.NewResourceDetector()
 	}
 }
