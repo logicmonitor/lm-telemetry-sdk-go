@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	azureFunctionWorkingDirectory = "FUNCTIONS_WORKER_DIRECTORY"
-	azureFunctions                = "azure-functions"
-	websiteDeploymentID           = "WEBSITE_DEPLOYMENT_ID"
+	azureFunctionEnvVar = "SUDO_COMMAND"
+	azureFunctions      = "azure-functions"
+	websiteDeploymentID = "WEBSITE_DEPLOYMENT_ID"
 )
 
 var (
@@ -51,12 +51,12 @@ func (afunc *AzureFunction) Detect(ctx context.Context) (*resource.Resource, err
 }
 
 func isAzureFunction() bool {
-	workingDir, ok := os.LookupEnv(azureFunctionWorkingDirectory)
+	sudoCmnd, ok := os.LookupEnv(azureFunctionEnvVar)
 	if !ok {
 		return false
 	}
 
-	if strings.Contains(workingDir, azureFunctions) {
+	if strings.Contains(sudoCmnd, azureFunctions) {
 		return true
 	}
 	return false
