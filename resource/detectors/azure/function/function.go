@@ -12,10 +12,9 @@ import (
 )
 
 const (
-	azureFunctionWorkingDirectory = "FUNCTIONS_WORKER_DIRECTORY"
-	azureFunctionEnvVar           = "SUDO_COMMAND"
-	azureFunctions                = "azure-functions"
-	websiteDeploymentID           = "WEBSITE_DEPLOYMENT_ID"
+	azureFunctionEnvVar = "SUDO_COMMAND"
+	azureFunctions      = "azure-functions"
+	websiteDeploymentID = "WEBSITE_DEPLOYMENT_ID"
 )
 
 var (
