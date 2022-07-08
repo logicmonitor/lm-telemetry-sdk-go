@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+
+	"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -15,6 +17,25 @@ const (
 	authorizationHeaderKey = "Authorization"
 	xLMAccountHeaderKey    = "x-logicmonitor-account"
 )
+
+func WithGRPCCredentials(cred credentials.TransportCredentials) Option {
+	return func(c *Config) {
+		c.Credential = cred
+	}
+}
+
+func WithGRPCTraceEndpoint(endpoint string) Option {
+	return func(c *Config) {
+		c.TraceEndpoint = endpoint
+		c.IsGRPCExporterConfigured = true
+	}
+}
+
+func WithInsecureHTTP() Option {
+	return func(c *Config) {
+		c.SecureHTTP = false
+	}
+}
 
 /*WithHTTPTraceEndpoint returns a config option which sets
 trace endpoint

@@ -6,15 +6,20 @@ import (
 	lmresource "github.com/logicmonitor/lm-telemetry-sdk-go/resource"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 //Config represents opentelemetry configurations
 type Config struct {
-	UserResourceAttributes map[string]string
-	Detector               resource.Detector
-	TraceEndpoint          string
-	InAppExporter          *sdkTraceExporter
-	SpanProcessor          func(sdktrace.SpanExporter) sdktrace.SpanProcessor
+	UserResourceAttributes   map[string]string
+	Detector                 resource.Detector
+	TraceEndpoint            string
+	InAppExporter            *sdkTraceExporter
+	SpanProcessor            func(sdktrace.SpanExporter) sdktrace.SpanProcessor
+	IsGRPCExporterConfigured bool
+	Credential               credentials.TransportCredentials
+	SecureHTTP               bool
 }
 
 type sdkTraceExporter struct {
@@ -28,7 +33,9 @@ type Option func(*Config)
 // NewConfig returns new instance of config
 func NewConfig() *Config {
 	return &Config{
-		Detector: &defaultDetector{},
+		Detector:   &defaultDetector{},
+		Credential: insecure.NewCredentials(),
+		SecureHTTP: true,
 	}
 }
 
