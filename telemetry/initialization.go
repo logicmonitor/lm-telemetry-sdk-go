@@ -2,15 +2,18 @@ package telemetry
 
 import (
 	"context"
+	"time"
 
 	"github.com/logicmonitor/lm-telemetry-sdk-go/config"
 	"github.com/logicmonitor/lm-telemetry-sdk-go/exporter/otlphttpexporter"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"google.golang.org/grpc"
 )
 
 /*SetupTelemetry initializes opentelemetry configurations,
@@ -43,11 +46,25 @@ func SetupTelemetry(ctx context.Context, opts ...config.Option) error {
 	var traceExporter sdktrace.SpanExporter
 	if c.InAppExporter != nil {
 		traceExporter, err = otlphttpexporter.NewOtlpHttpExporter(c.InAppExporter.TraceEndpoint, c.InAppExporter.Headers)
+	} else if c.IsGRPCExporterConfigured {
+		connCtx, cancel := context.WithTimeout(context.Background(), time.Second*100)
+		defer cancel()
+		conn, err := grpc.DialContext(connCtx, c.TraceEndpoint, grpc.WithTransportCredentials(c.Credential), grpc.WithBlock())
+		if err != nil {
+			return err
+		}
+		traceExporter, err = otlptracegrpc.New(connCtx, otlptracegrpc.WithGRPCConn(conn))
 	} else {
-		traceExporter, err = otlptracehttp.New(ctx,
-			otlptracehttp.WithInsecure(),
-			otlptracehttp.WithEndpoint(c.TraceEndpoint),
-		)
+		if c.SecureHTTP {
+			traceExporter, err = otlptracehttp.New(ctx,
+				otlptracehttp.WithEndpoint(c.TraceEndpoint),
+			)
+		} else {
+			traceExporter, err = otlptracehttp.New(ctx,
+				otlptracehttp.WithInsecure(),
+				otlptracehttp.WithEndpoint(c.TraceEndpoint),
+			)
+		}
 	}
 	if err != nil {
 		return err
