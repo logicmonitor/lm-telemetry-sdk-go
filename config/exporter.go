@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 )
 
 const (
@@ -16,12 +18,24 @@ const (
 	xLMAccountHeaderKey    = "x-logicmonitor-account"
 )
 
+func WithInsecureHTTPEndpoint() Option {
+	return func(c *Config) {
+		c.HTTPOption = append(c.HTTPOption, otlptracehttp.WithInsecure())
+	}
+}
+
+func WithHTTPTraceURLPath(url string) Option {
+	return func(c *Config) {
+		c.HTTPOption = append(c.HTTPOption, otlptracehttp.WithURLPath(url))
+	}
+}
+
 /*WithHTTPTraceEndpoint returns a config option which sets
 trace endpoint
 */
 func WithHTTPTraceEndpoint(endpoint string) Option {
 	return func(c *Config) {
-		c.TraceEndpoint = endpoint
+		c.HTTPOption = append(c.HTTPOption, otlptracehttp.WithEndpoint(endpoint))
 	}
 }
 
