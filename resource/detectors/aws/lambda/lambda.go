@@ -64,7 +64,7 @@ func (lm *Lambda) Detect(ctx context.Context) (*resource.Resource, error) {
 		}...)
 	}
 
-	return resource.NewSchemaless(attributes...), nil
+	return resource.Merge(resource.Default(), resource.NewSchemaless(attributes...))
 }
 
 var isAWSLambda = func() bool {
