@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -17,6 +19,19 @@ const (
 	authorizationHeaderKey = "Authorization"
 	xLMAccountHeaderKey    = "x-logicmonitor-account"
 )
+
+func WithGRPCEndpoint(endpoint string) Option {
+	return func(c *Config) {
+		c.IsGRPCExporterConfigured = true
+		c.GRPCOption = append(c.GRPCOption, otlptracegrpc.WithEndpoint(endpoint))
+	}
+}
+
+func WithGRPCCredential(cred credentials.TransportCredentials) Option {
+	return func(c *Config) {
+		c.GRPCOption = append(c.GRPCOption, otlptracegrpc.WithTLSCredentials(cred))
+	}
+}
 
 func WithInsecureHTTPEndpoint() Option {
 	return func(c *Config) {
