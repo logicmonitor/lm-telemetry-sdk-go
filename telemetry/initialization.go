@@ -35,7 +35,7 @@ func SetupTelemetry(ctx context.Context, opts ...config.Option) error {
 			attributes = append(attributes, attribute.String(key, value))
 		}
 		attrRes := resource.NewSchemaless(attributes...)
-		res, err = resource.Merge(attrRes, res)
+		res, err = resource.Merge(res, attrRes)
 		if err != nil {
 			return err
 		}
