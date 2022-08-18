@@ -20,6 +20,12 @@ const (
 	xLMAccountHeaderKey    = "x-logicmonitor-account"
 )
 
+func WithCustomHTTPHeaders(headers map[string]string) Option {
+	return func(c *Config) {
+		c.HTTPOption = append(c.HTTPOption, otlptracehttp.WithHeaders(headers))
+	}
+}
+
 func WithGRPCEndpoint(endpoint string) Option {
 	return func(c *Config) {
 		c.IsGRPCExporterConfigured = true
