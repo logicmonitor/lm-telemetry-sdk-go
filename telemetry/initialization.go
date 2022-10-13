@@ -68,7 +68,7 @@ func SetupTelemetry(ctx context.Context, opts ...config.Option) error {
 	}
 
 	tracerProvider := sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithSampler(c.Sampler),
 		sdktrace.WithResource(res),
 		sdktrace.WithSpanProcessor(sp),
 	)
