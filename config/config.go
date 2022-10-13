@@ -20,6 +20,7 @@ type Config struct {
 	HTTPOption               []otlptracehttp.Option
 	GRPCOption               []otlptracegrpc.Option
 	IsGRPCExporterConfigured bool
+	Sampler                  sdktrace.Sampler
 }
 
 type sdkTraceExporter struct {
@@ -34,6 +35,7 @@ type Option func(*Config)
 func NewConfig() *Config {
 	return &Config{
 		Detector: &defaultDetector{},
+		Sampler:  sdktrace.AlwaysSample(),
 	}
 }
 
