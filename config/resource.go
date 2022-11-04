@@ -43,7 +43,7 @@ func WithGCPcloudFunctionDetector() Option {
 	}
 }
 
-func WithAureVMDetector() Option {
+func WithAzureVMDetector() Option {
 	return func(c *Config) {
 		c.Detector = vm.NewResourceDetector()
 	}
