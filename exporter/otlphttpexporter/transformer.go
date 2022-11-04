@@ -26,7 +26,7 @@ func Spans(sdl []tracesdk.ReadOnlySpan) []*tracepb.ResourceSpans {
 		r  attribute.Distinct
 		il instrumentation.Library
 	}
-	ilsm := make(map[ilsKey]*tracepb.InstrumentationLibrarySpans)
+	ilsm := make(map[ilsKey]*tracepb.ScopeSpans)
 
 	var resources int
 	for _, sd := range sdl {
@@ -42,7 +42,7 @@ func Spans(sdl []tracesdk.ReadOnlySpan) []*tracepb.ResourceSpans {
 		ils, iOk := ilsm[iKey]
 		if !iOk {
 			// Either the resource or instrumentation library were unknown.
-			ils = &tracepb.InstrumentationLibrarySpans{
+			ils = &tracepb.ScopeSpans{
 				Spans:     []*tracepb.Span{},
 				SchemaUrl: sd.InstrumentationLibrary().SchemaURL,
 			}
@@ -55,9 +55,9 @@ func Spans(sdl []tracesdk.ReadOnlySpan) []*tracepb.ResourceSpans {
 			resources++
 			// The resource was unknown.
 			rs = &tracepb.ResourceSpans{
-				Resource:                    Resource(sd.Resource()),
-				InstrumentationLibrarySpans: []*tracepb.InstrumentationLibrarySpans{ils},
-				SchemaUrl:                   sd.Resource().SchemaURL(),
+				Resource:   Resource(sd.Resource()),
+				ScopeSpans: []*tracepb.ScopeSpans{ils},
+				SchemaUrl:  sd.Resource().SchemaURL(),
 			}
 			rsm[rKey] = rs
 			continue
@@ -69,7 +69,7 @@ func Spans(sdl []tracesdk.ReadOnlySpan) []*tracepb.ResourceSpans {
 		// been seen and the append we did above will be included it in the
 		// InstrumentationLibrarySpans reference.
 		if !iOk {
-			rs.InstrumentationLibrarySpans = append(rs.InstrumentationLibrarySpans, ils)
+			rs.ScopeSpans = append(rs.ScopeSpans, ils)
 		}
 	}
 
